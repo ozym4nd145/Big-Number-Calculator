@@ -8,11 +8,11 @@ int DivErr = 0;
 int SqrtErr = 0;
 int LowPrec = 0;
 int MAX_LEN = 100;
+int LogErr = 0;
 
 /*
 Storing with least significant digit in front of the array
 */
-
 void error()
 {
 	printf("Some error Occured");
@@ -34,7 +34,6 @@ int calc_len(bigint* big)
 	}
 	return len;
 }
-
 bigint* retzero()
  {
   bigint* big = (bigint*) calloc(1,sizeof(bigint));
@@ -325,6 +324,82 @@ int iszero (bigint* a)
  	     return 1;
  	return 0;     	
  }
+bigint* ab(bigint* a)
+ {
+ 	bigint* a1 = clone_big(a);
+ 	a1->is_neg = 0;
+ 	return a1;
+ }
+bigint* big_sqrt(bigint* a)
+ {
+ 	if(iszero(a))
+ 		 return retzero();
+ 	if(a->is_neg == 1)
+ 	     { 
+ 	     	SqrtErr = 1;
+ 	     	error();
+ 	     }
+ 	bigint* ans = retzero();
+ 	ans->list[1]=1;
+ 	bigint* err = conv_str_to_bigint(0,"0.001");
+ 	while(lessthanequal(ab(div_big(sub(a,mult(ans,ans),1),a)),err)==0)
+ 	  {
+ 	  	bigint* fx = sub(mult(ans,ans),a,1);
+ 	  	bigint* two = conv_str_to_bigint(0,"2.0");
+ 	  	bigint* fdashx = mult(ans,two);
+ 	  	bigint* new = sub(ans,div_big(fx,fdashx),1);
+ 	  	ans = new;
+ 	  } 
+ 	return ans;     
+ } 
+bigint* big_log(bigint* a)
+{
+	bigint* one = conv_str_to_bigint(0,"1");
+	if(lessthanequal(a,retzero())==1)
+ 	     { 
+ 	     	LogErr = 1;
+ 	     	error();
+ 	     }
+ 	else if(iszero(sub(a,one,1))==1)
+ 	       return retzero();     
+ 	bigint* ans = retzero();  
+ 	bigint* zer = retzero();
+ 	bigint* err = conv_str_to_bigint(0,"1");
+ 	err->len_decimal = MAX_LEN - 2;
+ 	if(lessthan(a,one)==1)
+ 	{
+ 		bigint* term = sub(one,a,1);
+ 		bigint* curterm = sub(a,one,1);
+ 	    ans = sub(a,one,1);
+ 		bigint* cntr = sub(one,zer,1);
+ 		while(lessthanequal(ab(curterm),err)==0)
+ 		{
+ 			curterm = mult(curterm,cntr);
+ 			cntr = add(cntr,one,1);
+ 			curterm = div_big(curterm,cntr);
+ 			curterm = mult(curterm,term);
+ 			ans = add(ans,curterm,1);
+ 		}
+
+ 	}
+ 	else
+ 	{
+ 		bigint* term = sub(a,one,1);
+ 		term = div_big(term,a);
+ 		bigint* curterm = sub(term,zer,1);
+ 	    ans = sub(term,zer,1);
+ 		bigint* cntr = sub(one,zer,1);
+ 		while(lessthanequal(ab(curterm),err)==0)
+ 		{
+ 			curterm = mult(curterm,cntr);
+ 			cntr = add(cntr,one,1);
+ 			curterm = div_big(curterm,cntr);
+ 			curterm = mult(curterm,term);
+ 			ans = add(ans,curterm,1);
+ 		}
+ 	}
+ 	return ans;  
+}
 int main()
 {
 	char s[100];
