@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "assn3.h"
 
 int MAX_LEN = 100;
 int SynErr = 0;
@@ -11,14 +12,7 @@ int LowPrec = 0;
 /*
 Storing with least significant digit in front of the array
 */
-typedef struct
-{
-	int* list;
-	int len_decimal;
-	int arr_len;
-	int is_neg;
-} bigint;
-
+extern bigint;
 
 void error()
 {
