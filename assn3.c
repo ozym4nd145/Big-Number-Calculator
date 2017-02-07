@@ -35,6 +35,17 @@ int calc_len(bigint* big)
 	return len;
 }
 
+bigint* retzero()
+ {
+  bigint* big = (bigint*) calloc(1,sizeof(bigint));
+  big->list = (int*)calloc(2,sizeof(int));
+  big->list[0]=big->list[1]=0;
+  big->is_neg = 0; //check sign
+  big->arr_len = 2;
+  big->len_decimal = 1;
+  return big;
+ }
+
 bigint* conv_str_to_bigint(int is_neg,char* string)
 {
 	int len_str = strlen(string);
@@ -145,13 +156,14 @@ void print_list(int* l,int len)
 	printf("\n");
 }
 
-bigint* sub(bigint* a,bigint* b)
+bigint* sub(bigint* a,bigint* b,int ifred)
 {
 	b->is_neg = (b->is_neg+1)%2;
-	return add(a,b);
+	return add(a,b,ifred);
 }
 
-bigint* add(bigint* a, bigint* b)
+
+bigint* add(bigint* a, bigint* b,int ifred)
 {
 	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
 
@@ -197,11 +209,12 @@ bigint* add(bigint* a, bigint* b)
 			new_big->list[len] = carry;
 		}
 		// print_list(new_big->list,len+1);	
-		if(reduce(new_big) == -1)
+		if(ifred)
+		{if(reduce(new_big) == -1)
 		{
 			//RAISE ERROR;
 			error();
-		}
+		}}
 		// print_list(new_big->list,MAX_LEN);
 	}
 	else
@@ -227,8 +240,7 @@ bigint* add(bigint* a, bigint* b)
 			new_big->is_neg = (new_big->is_neg+1)%2;	//inverts the sign
 			carry = 1;
 			int temp = 0;
-			int i=0;
-			for(i=0;i<len;i++)
+			for(int i=0;i<len;i++)
 			{
 				temp = (9 - new_big->list[i] + carry);	
 				new_big->list[i] = temp % 10;
@@ -237,11 +249,12 @@ bigint* add(bigint* a, bigint* b)
 			new_big->list[len] = carry;
 		}
 		// print_list(new_big->list,len+1);
-		if(reduce(new_big) == -1)
+		if(ifred)
+		{if(reduce(new_big) == -1)
 		{
 			//RAISE ERROR;
 			error();
-		}
+		}}
 	}
 
 
@@ -250,20 +263,55 @@ bigint* add(bigint* a, bigint* b)
 	return new_big;
 }
 
-// int main()
-// {
-// 	char s[100];
-// 	scanf("%s",s);
-// 	bigint* big1 = conv_str_to_bigint(0,s);
-// 	print_bigint(big1);
-	
-// 	scanf("%s",s);
-// 	bigint* big2 = conv_str_to_bigint(0,s);
-// 	big2->is_neg = 1;
-// 	print_bigint(big2);
-// 	bigint* added = add(big1,big2);
-// 	print_bigint(added);
-	
+bigint* digmult(bigint* a,int x)
+ {
+ 	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
+ 	int len_a = a->arr_len;
+ 	new_big->arr_len = a->arr_len + 1;
+ 	int carry = 0,i;
+ 	new_big->list = (int*) calloc(len_a+1,sizeof(int));
+ 	for(i=0;i<len_a;i++)
+ 	{
+ 		new_big->list[i] = (x*a->list[i] + carry)%10;
+ 		carry = (x*a->list[i] + carry)/10;
+ 	}
+ 	new_big->list[i] = carry;
+ 	new_big->is_neg = a->is_neg;
+ 	return new_big;
+ }
 
-// 	return 0;
-// }
+bigint* mult(bigint* a,bigint* b)
+{
+ 	bigint* ans = retzero();
+ 	int len_a = a->arr_len;
+ 	int true_len = calc_len(a);
+ 	for(int i = true_len-1;i>=0;i--)
+ 	{
+ 		int x = a->list[i];
+ 		ans = add(digmult(b,x),digmult(ans,10),0);
+ 		// print_bigint(ans);
+ 	}
+ 	ans->len_decimal = b->len_decimal + a->len_decimal;
+ 	if(reduce(ans)==-1)
+ 		 error();
+ 	return ans;
+ } 
+
+int main()
+{
+	char s[100];
+	scanf("%s",s);
+	bigint* big1 = conv_str_to_bigint(0,s);
+	print_bigint(big1);
+	
+	scanf("%s",s);
+	bigint* big2 = conv_str_to_bigint(0,s);
+	big2->is_neg = 1;
+	print_bigint(big2);
+	bigint* added = add(big1,big2,1);
+	print_bigint(added);
+	bigint* mul = mult(big1,big2);
+	print_bigint(mul);
+
+	return 0;
+}
