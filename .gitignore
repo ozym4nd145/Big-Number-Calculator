@@ -1,2 +1,4 @@
 *.out
 *.ml
+*.tab.*
+lex.yy.*
