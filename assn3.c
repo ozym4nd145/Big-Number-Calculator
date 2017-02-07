@@ -296,7 +296,35 @@ bigint* mult(bigint* a,bigint* b)
  		 error();
  	return ans;
  } 
-
+int iszero (bigint* a)
+ {
+ 	int l = a->arr_len;
+ 	int i = 0;
+ 	for(i=0;i<l;i++)
+ 	{
+ 		if(a->list[i]!=0)
+ 			 return 0;
+ 	}
+ 	return 1;
+ }
+ int lessthan (bigint* a,bigint* b)
+ {
+ 	bigint* diff = sub(a,b,0);
+ 	if(iszero(diff))
+ 		 return 0;
+ 	if(diff->is_neg == 1)
+ 	     return 1;
+ 	return 0;     	
+ }
+  int lessthanequal (bigint* a,bigint* b)
+ {
+ 	bigint* diff = sub(a,b,0);
+ 	if(iszero(diff))
+ 		 return 1;
+ 	if(diff->is_neg == 1)
+ 	     return 1;
+ 	return 0;     	
+ }
 int main()
 {
 	char s[100];
@@ -306,12 +334,12 @@ int main()
 	
 	scanf("%s",s);
 	bigint* big2 = conv_str_to_bigint(0,s);
-	big2->is_neg = 1;
+	big2->is_neg = 0;
 	print_bigint(big2);
 	bigint* added = add(big1,big2,1);
 	print_bigint(added);
 	bigint* mul = mult(big1,big2);
 	print_bigint(mul);
-
+	printf(" less than equal %d",lessthanequal(big1,big2));
 	return 0;
 }
