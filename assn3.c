@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include "assn3.h"
 
-int MAX_LEN = 100;
 int SynErr = 0;
 int DivErr = 0;
 int SqrtErr = 0;
 int LowPrec = 0;
+int MAX_LEN = 100;
 
 /*
 Storing with least significant digit in front of the array

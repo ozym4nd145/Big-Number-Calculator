@@ -13,4 +13,5 @@
 	void print_bigint(bigint* big);
 	bigint* add(bigint* a, bigint* b);
 	bigint* sub(bigint* a,bigint* b);
+	extern int MAX_LEN;
 #endif

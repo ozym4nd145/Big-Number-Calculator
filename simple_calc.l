@@ -16,19 +16,15 @@
 	}
 
 "+" {
-		//printf("PLUS\n");
 		return ADD;
 	}
 "-" {
-		//printf("MINUS\n");
 		return SUB;
 	}
 "*" {
-		//printf("MULTIPLY\n");
 		return MUL;
 	}
 "/" {
-		//printf("DIVIDE\n");
 		return DIV;
 	}
 
@@ -47,11 +43,12 @@
 "LOG" {
 			return LOG;
 		}
-.	{
-	//printf("IGNORE\n");
+[ \t\r]+ {}
+\n 	{
+		return EOL;
 	}
-\n {
-	return EOL;
+.	{
+		yyerror("SynErr");
 	}
 
 %%;

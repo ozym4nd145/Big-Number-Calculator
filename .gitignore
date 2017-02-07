@@ -2,3 +2,4 @@
 *.ml
 *.tab.*
 lex.yy.*
+simple_calc

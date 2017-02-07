@@ -3,6 +3,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "assn3.h"
+	int MAX_LEN;
 %}
 
 %union {
@@ -62,6 +63,7 @@ term: NUMBER {
 main(int argc, char* argv[])
 {
 	freopen("input.txt","r",stdin);
+	scanf("%d ",&MAX_LEN);
 	yyparse();
 }
 
