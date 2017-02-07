@@ -36,7 +36,7 @@ exp: factor
 
 factor: term
 	|	factor MUL term {$$ = mult($1,$3); }
-	|	factor DIV term {$$ = $1; }
+	|	factor DIV term {$$ = div_big($1,$3); }
 	;
 
 term: NUMBER {
@@ -53,8 +53,8 @@ term: NUMBER {
 			$$ = big;
 		}
 	| OP exp CP {$$ = $2;}
-	| SQRT term {$$ = $2;}
-	| LOG term {$$ = $2;}
+	| SQRT term {$$ = big_sqrt($2);}
+	| LOG term {$$ = big_log($2);}
 	| POW term {$$ = $2;}
 	;
 

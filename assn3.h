@@ -21,5 +21,10 @@
 	int lessthan (bigint* a,bigint* b);
 	int iszero (bigint* a);
 	bigint* clone_big(bigint* a);
+	bigint* big_sqrt(bigint* a);
+	bigint* big_log(bigint* a);
+	bigint* ab(bigint* a);
+	int iszero (bigint* a);
+
 	extern int MAX_LEN;
 #endif
