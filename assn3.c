@@ -264,7 +264,7 @@ bigint* add(bigint* a, bigint* b,int ifred)
 }
 
 bigint* digmult(bigint* a,int x)
- {
+{
  	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
  	int len_a = a->arr_len;
  	new_big->arr_len = a->arr_len + 1;
@@ -297,8 +297,37 @@ bigint* mult(bigint* a,bigint* b)
  	return ans;
 } 
 
+int iszero (bigint* a)
+{
+	int l = a->arr_len;
+	int i = 0;
+	for(i=0;i<l;i++)
+	{
+		if(a->list[i]!=0)
+			 return 0;
+	}
+	return 1;
+}
 
+int lessthan (bigint* a,bigint* b)
+{
+	bigint* diff = sub(a,b,0);
+	if(iszero(diff))
+		 return 0;
+	if(diff->is_neg == 1)
+	     return 1;
+	return 0;     	
+}
 
+int lessthanequal (bigint* a,bigint* b)
+{
+	bigint* diff = sub(a,b,0);
+	if(iszero(diff))
+		 return 1;
+	if(diff->is_neg == 1)
+	     return 1;
+	return 0;     	
+}
 
 bigint* div(bigint* a,bigint* b)
 {
@@ -350,21 +379,31 @@ bigint* div(bigint* a,bigint* b)
 	return quo;
 }
 
-// int main()
-// {
-// 	char s[100];
-// 	scanf("%s",s);
-// 	bigint* big1 = conv_str_to_bigint(0,s);
-// 	print_bigint(big1);
+int main()
+{
+	char s[100];
+	scanf("%s",s);
+	bigint* big1 = conv_str_to_bigint(0,s);
+	print_bigint(big1);
 	
-// 	scanf("%s",s);
-// 	bigint* big2 = conv_str_to_bigint(0,s);
-// 	big2->is_neg = 1;
-// 	print_bigint(big2);
-// 	bigint* added = add(big1,big2,1);
-// 	print_bigint(added);
-// 	bigint* mul = mult(big1,big2);
-// 	print_bigint(mul);
+	scanf("%s",s);
+	bigint* big2 = conv_str_to_bigint(0,s);
+	big2->is_neg = 1;
+	print_bigint(big2);
+	bigint* added = add(big1,big2,1);
+	print_bigint(added);
+	bigint* mul = mult(big1,big2);
+	print_bigint(mul);
 
-// 	return 0;
-// }
+	return 0;
+	scanf("%s",s);
+	bigint* big2 = conv_str_to_bigint(0,s);
+	big2->is_neg = 0;
+	print_bigint(big2);
+	bigint* added = add(big1,big2,1);
+	print_bigint(added);
+	bigint* mul = mult(big1,big2);
+	print_bigint(mul);
+	printf(" less than equal %d",lessthanequal(big1,big2));
+	return 0;
+}
