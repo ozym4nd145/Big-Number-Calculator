@@ -295,23 +295,76 @@ bigint* mult(bigint* a,bigint* b)
  	if(reduce(ans)==-1)
  		 error();
  	return ans;
- } 
+} 
 
-int main()
+
+
+
+bigint* div(bigint* a,bigint* b)
 {
-	char s[100];
-	scanf("%s",s);
-	bigint* big1 = conv_str_to_bigint(0,s);
-	print_bigint(big1);
-	
-	scanf("%s",s);
-	bigint* big2 = conv_str_to_bigint(0,s);
-	big2->is_neg = 1;
-	print_bigint(big2);
-	bigint* added = add(big1,big2,1);
-	print_bigint(added);
-	bigint* mul = mult(big1,big2);
-	print_bigint(mul);
+	reduce(a);
+	reduce(b);
+	int len_a = calc_len(a);
+	int len_b = calc_len(b);
 
-	return 0;
+	bigint* quo = (bigint*) calloc(1, sizeof(bigint));
+	quo->list = (int*) calloc(MAX_LEN,sizeof(int));
+	quo->arr_len = MAX_LEN;
+	quo->is_neg = (a->is_neg + b->is_neg)%2;
+	int i=0;
+	quo->len_decimal = -1*(lena-lenb);
+
+	/**
+	 * Made a and b of same length
+	 */
+	for(i=0;i<(lena-lenb);i++)
+	{
+		a = digmult(a,10);
+	}
+
+	i=MAX_LEN-1; //denotes current position
+
+	int decimal_on = 0;
+
+	for(;i>=0;i--)
+	{
+		if(!decimal_on && less_than(b,a))
+		{
+			decimal_on = 1;
+			b = digmult(b,10);
+		}
+		int curr = 0;
+		while(less_than(a,b))
+		{
+			b = sub(b,a);
+			curr++;
+		}
+		quo->list[i] = curr;
+		if(decimal_on)
+		{
+			quo->len_decimal++;
+		}
+		b = digmult(b,10);
+	}
+	
+	return quo;
 }
+
+// int main()
+// {
+// 	char s[100];
+// 	scanf("%s",s);
+// 	bigint* big1 = conv_str_to_bigint(0,s);
+// 	print_bigint(big1);
+	
+// 	scanf("%s",s);
+// 	bigint* big2 = conv_str_to_bigint(0,s);
+// 	big2->is_neg = 1;
+// 	print_bigint(big2);
+// 	bigint* added = add(big1,big2,1);
+// 	print_bigint(added);
+// 	bigint* mul = mult(big1,big2);
+// 	print_bigint(mul);
+
+// 	return 0;
+// }

@@ -30,12 +30,12 @@ calclist:
 	;
 
 exp: factor
-	|	exp ADD factor { $$ = add($1,$3);}
-	|	exp SUB factor { $$ = sub($1,$3); }
+	|	exp ADD factor { $$ = add($1,$3,1);}
+	|	exp SUB factor { $$ = sub($1,$3,1); }
 	;
 
 factor: term
-	|	factor MUL term {$$ = $1; }
+	|	factor MUL term {$$ = mult($1,$3); }
 	|	factor DIV term {$$ = $1; }
 	;
 
@@ -62,7 +62,7 @@ term: NUMBER {
 
 main(int argc, char* argv[])
 {
-	freopen("input.txt","r",stdin);
+	//freopen("input.txt","r",stdin);
 	scanf("%d ",&MAX_LEN);
 	yyparse();
 }
