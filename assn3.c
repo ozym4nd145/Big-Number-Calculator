@@ -12,7 +12,6 @@ int LowPrec = 0;
 /*
 Storing with least significant digit in front of the array
 */
-extern bigint;
 
 void error()
 {
@@ -146,6 +145,12 @@ void print_list(int* l,int len)
 	printf("\n");
 }
 
+bigint* sub(bigint* a,bigint* b)
+{
+	b->is_neg = (b->is_neg+1)%2;
+	return add(a,b);
+}
+
 bigint* add(bigint* a, bigint* b)
 {
 	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
@@ -222,7 +227,8 @@ bigint* add(bigint* a, bigint* b)
 			new_big->is_neg = (new_big->is_neg+1)%2;	//inverts the sign
 			carry = 1;
 			int temp = 0;
-			for(int i=0;i<len;i++)
+			int i=0;
+			for(i=0;i<len;i++)
 			{
 				temp = (9 - new_big->list[i] + carry);	
 				new_big->list[i] = temp % 10;
@@ -244,20 +250,20 @@ bigint* add(bigint* a, bigint* b)
 	return new_big;
 }
 
-int main()
-{
-	char s[100];
-	scanf("%s",s);
-	bigint* big1 = conv_str_to_bigint(0,s);
-	print_bigint(big1);
+// int main()
+// {
+// 	char s[100];
+// 	scanf("%s",s);
+// 	bigint* big1 = conv_str_to_bigint(0,s);
+// 	print_bigint(big1);
 	
-	scanf("%s",s);
-	bigint* big2 = conv_str_to_bigint(0,s);
-	big2->is_neg = 1;
-	print_bigint(big2);
-	bigint* added = add(big1,big2);
-	print_bigint(added);
+// 	scanf("%s",s);
+// 	bigint* big2 = conv_str_to_bigint(0,s);
+// 	big2->is_neg = 1;
+// 	print_bigint(big2);
+// 	bigint* added = add(big1,big2);
+// 	print_bigint(added);
 	
 
-	return 0;
-}
+// 	return 0;
+// }

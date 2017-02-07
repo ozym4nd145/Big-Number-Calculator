@@ -1,7 +1,9 @@
 %{
+	#include "assn3.h"
 	#include "simple_calc.tab.h"
 	#include <string.h>
 	#include <stdlib.h>
+
 %}
 
 %%
@@ -30,10 +32,9 @@
 		return DIV;
 	}
 
-[0-9]+ {
-	//yylval = atoi(yytext);
-	yylval.float_val = atof(yytext);
-	printf("Number - %f %s",yylval.float_val,yytext);
+[0-9]+(\.[0-9]+)? {
+	char* numb = strdup(yytext);	
+	yylval.stri = numb;
 	return NUMBER;
 	}
 
@@ -46,7 +47,7 @@
 "LOG" {
 			return LOG;
 		}
-. {
+.	{
 	//printf("IGNORE\n");
 	}
 \n {
