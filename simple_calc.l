@@ -48,7 +48,7 @@
 		return EOL;
 	}
 .	{
-		yyerror("SynErr");
+		fprintf(stderr,"SynErr\n");
 	}
 
 %%;

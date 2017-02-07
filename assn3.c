@@ -15,7 +15,8 @@ Storing with least significant digit in front of the array
 */
 void error()
 {
-	printf("Some error Occured");
+	printf("Some error Occured\n");
+	exit(-1);
 }
 
 int max(int a, int b)
@@ -73,79 +74,53 @@ bigint* conv_str_to_bigint(int is_neg,char* string)
 
 int reduce(bigint* big)
 {
-	if(big->arr_len > MAX_LEN)
+	// if(big->arr_len > MAX_LEN)
+	int len_total = calc_len(big);
+	int trailing_zeros = 0;
+	int i=0;
+	for(i=0;i<big->len_decimal&&big->list[i]==0;i++)
 	{
-		int len_total = calc_len(big);
-		int trailing_zeros = 0;
-		int i=0;
-		for(i=0;i<big->len_decimal&&big->list[i]==0;i++)
-		{
-			trailing_zeros++;
-		}
-		int final_len = len_total - trailing_zeros;
-		int final_decimal_len = big->len_decimal - trailing_zeros;
-		int final_integer_len = final_len - final_decimal_len;
-
-		int* new_list = (int *) calloc(MAX_LEN,sizeof(int));
-		
-		if(final_integer_len > MAX_LEN)
-		{
-			LowPrec = 1;
-			return -1;
-		}
-
-		if(final_len <= MAX_LEN)
-		{
-			int j=trailing_zeros;
-			for(i=0;i<final_len;i++,j++)
-			{
-				new_list[i] = big->list[j];
-			}
-			big->len_decimal -= trailing_zeros;
-		}
-		else
-		{
-			//TODO: Round Off Procedure
-			int i= len_total - MAX_LEN;
-			int j=0;
-			for(;i<len_total;i++)
-			{
-				new_list[j] = big->list[i];
-				j++;
-			}
-			big->len_decimal = MAX_LEN - final_integer_len;
-		}
-		free(big->list);
-		big->list = new_list;
-		big->arr_len = MAX_LEN;
-		return 0;
+		trailing_zeros++;
 	}
+	int final_len = len_total - trailing_zeros;
+	int final_decimal_len = big->len_decimal - trailing_zeros;
+	int final_integer_len = final_len - final_decimal_len;
+
+	int* new_list = (int *) calloc(MAX_LEN,sizeof(int));
+	
+	if(final_integer_len > MAX_LEN)
+	{
+		LowPrec = 1;
+		return -1;
+	}
+
+	if(final_len <= MAX_LEN)
+	{
+		int j=trailing_zeros;
+		for(i=0;i<final_len;i++,j++)
+		{
+			new_list[i] = big->list[j];
+		}
+		big->len_decimal -= trailing_zeros;
+	}
+	else
+	{
+		//TODO: Round Off Procedure
+		int i= len_total - MAX_LEN;
+		int j=0;
+		for(;i<len_total;i++)
+		{
+			new_list[j] = big->list[i];
+			j++;
+		}
+		big->len_decimal = MAX_LEN - final_integer_len;
+	}
+	free(big->list);
+	big->list = new_list;
+	big->arr_len = MAX_LEN;
 	return 0;
 }
 
-void print_bigint(bigint* big)
-{
-	int len_total = calc_len(big);
-	int i=(len_total)-1;
-	int idx_dot = (big->len_decimal);
-	if(big->is_neg)
-	{
-		printf("-");
-	}
-	for(;i>=idx_dot;i--)
-	{
-		printf("%d",big->list[i]);
-	}
-	if(i>=0)
-	{
-		printf(".");
-	}
-	for(;i>=0;i--)
-	{
-		printf("%d",big->list[i]);
-	}
-	printf("\n");
-}
 
 void print_list(int* l,int len)
 {
@@ -155,10 +130,54 @@ void print_list(int* l,int len)
 	printf("\n");
 }
 
+
+void print_bigint(bigint* big)
+{
+	int len_total = calc_len(big);
+
+	int i=(len_total)-1;
+	int idx_dot = (big->len_decimal);
+	if(big->is_neg)
+	{
+		printf("-");
+	}
+	if(idx_dot >= len_total)
+	{
+		printf("0.");
+		int i=0;
+		for(i=0;i<(big->len_decimal-len_total);i++)
+		{
+			printf("0");
+		}
+		for(i=len_total-1;i>=0;i--)
+		{
+			printf("%d",big->list[i]);
+		}
+	}
+	else
+	{
+		for(;i>=idx_dot;i--)
+		{
+			printf("%d",big->list[i]);
+		}
+		if(i>=0)
+		{
+			printf(".");
+		}
+		for(;i>=0;i--)
+		{
+			printf("%d",big->list[i]);
+		}
+	}
+	printf("\n");
+}
+
 bigint* sub(bigint* a,bigint* b,int ifred)
 {
 	b->is_neg = (b->is_neg+1)%2;
-	return add(a,b,ifred);
+	bigint* result= add(a,b,ifred);
+	b->is_neg = (b->is_neg+1)%2;
+	return result;
 }
 
 
@@ -263,7 +282,7 @@ bigint* add(bigint* a, bigint* b,int ifred)
 }
 
 bigint* digmult(bigint* a,int x)
- {
+{
  	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
  	int len_a = a->arr_len;
  	new_big->arr_len = a->arr_len + 1;
@@ -294,7 +313,8 @@ bigint* mult(bigint* a,bigint* b)
  	if(reduce(ans)==-1)
  		 error();
  	return ans;
- } 
+} 
+
 int iszero (bigint* a)
  {
  	int l = a->arr_len;
@@ -400,21 +420,150 @@ bigint* big_log(bigint* a)
  	}
  	return ans;  
 }
+
+bigint* clone_big(bigint* a)
+{
+	bigint* new_big = (bigint*)calloc(1,sizeof(bigint));
+	new_big->list = (int*)calloc(a->arr_len,sizeof(int));
+	new_big->arr_len = a->arr_len;
+	new_big->is_neg = a->is_neg;
+	new_big->len_decimal = a->len_decimal;
+	int i=0;
+	for(i=0;i<a->arr_len;i++)
+	{
+		new_big->list[i] = a->list[i];
+	}
+	return new_big;
+}
+
+bigint* div_big(bigint* a,bigint* b)
+{
+	if(iszero(b))
+	{
+		DivErr = 1;
+		error();
+	}
+	bigint* new_a = clone_big(b);
+	bigint* new_b = clone_big(a);
+	reduce(new_a);
+	reduce(new_b);
+	
+	// print_bigint(new_a);
+	// print_bigint(new_b);
+	int len_a = calc_len(new_a);
+	int len_b = calc_len(new_b);
+
+	bigint* quo = (bigint*) calloc(1, sizeof(bigint));
+	quo->list = (int*) calloc(MAX_LEN,sizeof(int));
+	quo->arr_len = MAX_LEN;
+	quo->is_neg = (new_a->is_neg + new_b->is_neg)%2;
+	
+	int decimal_len = (a->len_decimal - b->len_decimal);
+	// printf("decimal_len - %d",decimal_len);
+	new_a->len_decimal = 0;
+	new_b->len_decimal = 0;
+	int i=0;
+	
+	decimal_len += (len_a-len_b);
+	// printf("decimal_len - %d",decimal_len);
+
+	/**
+	 * Made a and b of same length
+	 */
+	for(i=0;i<(len_b-len_a);i++)
+	{
+		new_a = digmult(new_a,10);
+	}
+	for(i=0;i<(len_a-len_b);i++)
+	{
+		new_b = digmult(new_b,10);
+	}
+	// printf("After same_lengthification ");
+	// print_bigint(new_a);
+	i=MAX_LEN-1; //denotes current position
+
+	int decimal_on = 0;
+
+	for(;i>=0;i--)
+	{
+		// printf("------------------------------------------------------\n");
+		// printf("Iteration - %d\nDecimal_On - %d\n",MAX_LEN - i,decimal_on);
+		// printf("Dividend - ");print_bigint(new_b);
+		// printf("Divisor - ");print_bigint(new_a);
+		// printf("Quotient - ");print_bigint(quo);
+		// printf("Decimal_len - %d\n",decimal_len);
+		// printf("------------------------------------------------------\n");
+		if(!decimal_on && lessthan(new_b,new_a))
+		{
+			decimal_on = 1;
+		}
+		if(decimal_on)
+		{
+			new_b = digmult(new_b,10);
+		}
+		int curr = 0;
+		while(lessthanequal(new_a,new_b))
+		{
+			new_b = sub(new_b,new_a,0);
+			curr++;
+		}
+		quo->list[i] = curr;
+		if(decimal_on)
+		{
+			decimal_len++;
+		}
+	}
+	if(decimal_len >= 2*MAX_LEN)
+	{
+		free(quo->list);
+		quo->list = (int*) calloc(MAX_LEN,sizeof(int));
+	}
+	else if(decimal_len > MAX_LEN)
+	{
+		int i=0;
+		int j=decimal_len-MAX_LEN;
+		for(;j<MAX_LEN;j++,i++)
+		{
+			quo->list[i] = quo->list[j];
+		}
+		for(;i<MAX_LEN;i++)
+		{
+			quo->list[i] = 0;
+		}
+		quo->len_decimal = MAX_LEN;
+	}
+	else
+	{
+		quo->len_decimal = decimal_len;
+	}
+
+	// print_list(quo->list,MAX_LEN);
+	reduce(quo);
+	// print_list(quo->list,MAX_LEN);
+	return quo;
+}
+
 int main()
 {
 	char s[100];
 	scanf("%s",s);
 	bigint* big1 = conv_str_to_bigint(0,s);
-	print_bigint(big1);
+	// print_bigint(big1);
 	
 	scanf("%s",s);
 	bigint* big2 = conv_str_to_bigint(0,s);
-	big2->is_neg = 0;
-	print_bigint(big2);
-	bigint* added = add(big1,big2,1);
-	print_bigint(added);
-	bigint* mul = mult(big1,big2);
-	print_bigint(mul);
-	printf(" less than equal %d",lessthanequal(big1,big2));
+	// big2->is_neg = 0;
+	// print_bigint(big2);
+	// bigint* subbed = sub(big1,big2,1);
+	// print_bigint(subbed);
+	// print_bigint(big1);
+	// print_bigint(big2);
+	// bigint* mul = mult(big1,big2);
+	// print_bigint(mul);
+	// print_bigint(big1);
+	// print_bigint(big2);
+	// printf("less than equal %d\n",lessthanequal(big1,big2));
+	bigint* div1 = div_big(big1,big2);
+	print_bigint(div1);
 	return 0;
 }
