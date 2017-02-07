@@ -16,5 +16,10 @@
 	bigint* retzero();
 	bigint* digmult(bigint* a,int x);
 	bigint* mult(bigint* a,bigint* b);
+	bigint* div_big(bigint* a,bigint* b);
+	int lessthanequal (bigint* a,bigint* b);
+	int lessthan (bigint* a,bigint* b);
+	int iszero (bigint* a);
+	bigint* clone_big(bigint* a);
 	extern int MAX_LEN;
 #endif
