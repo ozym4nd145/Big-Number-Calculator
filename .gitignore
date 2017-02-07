@@ -1,0 +1,5 @@
+*.out
+*.ml
+*.tab.*
+lex.yy.*
+simple_calc
