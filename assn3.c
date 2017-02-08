@@ -471,8 +471,13 @@ bigint* big_log(bigint* a)
  	    char x[MAX_LEN+2];
  	    sprintf(x,"%d",no_dig);
  	    bigint* mantissa = conv_str_to_bigint(0,x);
- 	    print_bigint(mantissa);
- 	    bigint* log10 = conv_str_to_bigint(0,"2.30258509299");	
+ 	    // print_bigint(mantissa);
+ 	    char *log_10 = "2.30258509299\0";
+ 	    if(MAX_LEN < 12)
+ 	    {
+ 	    	log_10[MAX_LEN] = '\0';
+ 	    }
+ 	    bigint* log10 = conv_str_to_bigint(0,log_10);	
  	    print_bigint(log10);
  	    mantissa = mult(mantissa,log10,0);
  	    print_bigint(mantissa);
