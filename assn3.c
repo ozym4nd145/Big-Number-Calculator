@@ -166,6 +166,11 @@ void print_bigint(bigint* big)
 
 	int i=(len_total)-1;
 	int idx_dot = (big->len_decimal);
+	if(iszero(big))
+	{
+		printf("0\n");
+		return;
+	}
 	if(big->is_neg)
 	{
 		printf("-");
