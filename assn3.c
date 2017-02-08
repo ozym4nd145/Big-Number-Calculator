@@ -322,9 +322,11 @@ bigint* add(bigint* a, bigint* b,int ifred)
 bigint* digmult(bigint* a,int x)
 {
  	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
- 	int alen = calc_len(a);
- 	int len_a = -1*max(-1*a->arr_len,-1*alen);
- 	new_big->arr_len = a->arr_len + 1;
+ 	int len_a = calc_len(a);
+ 	// int len_a = -1*max(-1*a->arr_len,-1*alen);
+ 	// int len_a = a->arr_len;
+ 	// new_big->arr_len = a->arr_len + 1;
+ 	new_big->arr_len = len_a + 1;
  	int carry = 0,i;
  	new_big->list = (int*) calloc(len_a+1,sizeof(int));
  	for(i=0;i<len_a;i++)
@@ -367,7 +369,7 @@ int iszero (bigint* a)
  	}
  	return 1;
  }
- int lessthan (bigint* a,bigint* b)
+int lessthan (bigint* a,bigint* b)
  {
  	bigint* diff = sub(a,b,0);
  	if(iszero(diff))
@@ -376,7 +378,7 @@ int iszero (bigint* a)
  	     return 1;
  	return 0;     	
  }
-  int lessthanequal (bigint* a,bigint* b)
+int lessthanequal (bigint* a,bigint* b)
  {
  	bigint* diff = sub(a,b,0);
  	if(iszero(diff))
@@ -440,6 +442,14 @@ bigint* big_log(bigint* a)
  	bigint* zer = retzero();
  	bigint* err = conv_str_to_bigint(0,"1");
  	err->len_decimal =-1*max(1-MAX_LEN,-5);
+
+ 	char log_10[] = "2.3025137650431014377934029533004176534526905103187315981639\0";
+    if(MAX_LEN < strlen(log_10))
+    {
+    	log_10[MAX_LEN] = '\0';
+    }
+    bigint* log10 = conv_str_to_bigint(0,log_10);
+
  	if(lessthan(a,one)==1)
  	{
  		bigint* term = sub(one,a,1);
@@ -454,7 +464,7 @@ bigint* big_log(bigint* a)
  			curterm = mult(curterm,term,0);
  			ans = add(ans,curterm,1);
  		}
-
+ 	    ans = div_big(ans,log10);
  	}
  	else
  	{
@@ -473,13 +483,8 @@ bigint* big_log(bigint* a)
  	    sprintf(x,"%d",no_dig);
  	    bigint* mantissa = conv_str_to_bigint(0,x);
  	    // print_bigint(mantissa);
- 	    char log_10[] = "2.30258509299\0";
- 	    if(MAX_LEN < 12)
- 	    {
- 	    	log_10[MAX_LEN] = '\0';
- 	    }
- 	    bigint* log10 = conv_str_to_bigint(0,log_10);	
- 	    mantissa = mult(mantissa,log10,0);
+ 	    	
+ 	    // mantissa = mult(mantissa,log10,0);
  	    ans = add(ans,mantissa,1);
  	}
  	return ans;  
