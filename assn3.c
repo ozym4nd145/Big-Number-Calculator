@@ -322,7 +322,8 @@ bigint* add(bigint* a, bigint* b,int ifred)
 bigint* digmult(bigint* a,int x)
 {
  	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
- 	int len_a = a->arr_len;
+ 	int alen = calc_len(a);
+ 	int len_a = -1*max(-1*a->arr_len,-1*alen);
  	new_big->arr_len = a->arr_len + 1;
  	int carry = 0,i;
  	new_big->list = (int*) calloc(len_a+1,sizeof(int));
