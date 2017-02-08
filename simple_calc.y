@@ -35,7 +35,7 @@ exp: factor
 	;
 
 factor: term
-	|	factor MUL term {$$ = mult($1,$3); }
+	|	factor MUL term {$$ = mult($1,$3,1); }
 	|	factor DIV term {$$ = div_big($1,$3); }
 	;
 
@@ -64,6 +64,7 @@ main(int argc, char* argv[])
 {
 	//freopen("input.txt","r",stdin);
 	scanf("%d ",&MAX_LEN);
+	MAX_LEN = 2*MAX_LEN;
 	yyparse();
 }
 

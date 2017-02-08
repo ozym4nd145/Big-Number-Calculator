@@ -9,13 +9,13 @@
 	} bigint;
 
 	bigint* conv_str_to_bigint(int is_neg,char* string);
-	int reduce(bigint* big);
+	int reduce(int m,bigint* big);
 	void print_bigint(bigint* big);
 	bigint* add(bigint* a, bigint* b,int ifred);
 	bigint* sub(bigint* a,bigint* b,int ifred);
 	bigint* retzero();
 	bigint* digmult(bigint* a,int x);
-	bigint* mult(bigint* a,bigint* b);
+	bigint* mult(bigint* a,bigint* b,int ifred);
 	bigint* div_big(bigint* a,bigint* b);
 	int lessthanequal (bigint* a,bigint* b);
 	int lessthan (bigint* a,bigint* b);
