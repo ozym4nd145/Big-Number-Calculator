@@ -27,5 +27,14 @@
 	int iszero (bigint* a);
 	bigint* power(bigint* a, bigint* b);
 	void del_big(bigint* big);
+	int calc_len(bigint* big);
+
 	extern int MAX_LEN;
+	extern int SynErr;
+	extern int DivErr;
+	extern int SqrtErr;
+	extern int LowPrec;
+	extern int LogErr;
+	extern int FracPowErr;
+	extern int NegPowErr;
 #endif

@@ -16,7 +16,34 @@ Storing with least significant digit in front of the array
 */
 void error()
 {
-	printf("Some error Occured\n");
+	if(SynErr)
+	{
+		printf("SynErr\n");
+	}
+	if(DivErr)
+	{
+		printf("DivErr\n");
+	}
+	if(SqrtErr)
+	{
+		printf("SqrtErr\n");
+	}
+	if(LowPrec)
+	{
+		printf("LowPrec\n");
+	}
+	if(LogErr)
+	{
+		printf("LogErr\n");
+	}
+	if(FracPowErr)
+	{
+		printf("FracPowErr\n");
+	}
+	if(NegPowErr)
+	{
+		printf("NegPowErr\n");
+	}
 	exit(-1);
 }
 
@@ -70,12 +97,12 @@ bigint* conv_str_to_bigint(int is_neg,char* string)
 			// big->len_total--;
 		}
 	}
+	reduce(big);
 	return big;
 }
 
 int reduce(bigint* big)
 {
-	// if(big->arr_len > MAX_LEN)
 	int len_total = calc_len(big);
 	int trailing_zeros = 0;
 	int i=0;
@@ -92,6 +119,7 @@ int reduce(bigint* big)
 	if(final_integer_len > MAX_LEN)
 	{
 		LowPrec = 1;
+		error();
 		return -1;
 	}
 
@@ -229,11 +257,13 @@ bigint* add(bigint* a, bigint* b,int ifred)
 		}
 		// print_list(new_big->list,len+1);	
 		if(ifred)
-		{if(reduce(new_big) == -1)
 		{
-			//RAISE ERROR;
-			error();
-		}}
+			if(reduce(new_big) == -1)
+			{
+				//RAISE ERROR;
+				error();
+			}
+		}
 		// print_list(new_big->list,MAX_LEN);
 	}
 	else

@@ -4,6 +4,8 @@
 	#include <string.h>
 	#include <stdlib.h>
 
+	int SynErr;
+
 %}
 
 %%
@@ -50,7 +52,8 @@
 		return EOL;
 	}
 .	{
-		fprintf(stderr,"SynErr\n");
+		SynErr = 1;
+		error();
 	}
 
 %%;
