@@ -9,7 +9,8 @@ int SqrtErr = 0;
 int LowPrec = 0;
 int MAX_LEN = 100;
 int LogErr = 0;
-
+int FracPowErr = 0;
+int NegPowErr = 0;
 /*
 Storing with least significant digit in front of the array
 */
@@ -258,7 +259,8 @@ bigint* add(bigint* a, bigint* b,int ifred)
 			new_big->is_neg = (new_big->is_neg+1)%2;	//inverts the sign
 			carry = 1;
 			int temp = 0;
-			for(int i=0;i<len;i++)
+			int i=0;
+			for(i=0;i<len;i++)
 			{
 				temp = (9 - new_big->list[i] + carry);	
 				new_big->list[i] = temp % 10;
@@ -303,7 +305,8 @@ bigint* mult(bigint* a,bigint* b)
  	bigint* ans = retzero();
  	int len_a = a->arr_len;
  	int true_len = calc_len(a);
- 	for(int i = true_len-1;i>=0;i--)
+ 	int i = true_len-1;
+ 	for(i = true_len-1;i>=0;i--)
  	{
  		int x = a->list[i];
  		ans = add(digmult(b,x),digmult(ans,10),0);
@@ -454,6 +457,12 @@ bigint* clone_big(bigint* a)
 	return new_big;
 }
 
+void del_big(bigint* big)
+{
+	free(big->list);
+	free(big);
+}
+
 bigint* div_big(bigint* a,bigint* b)
 {
 	if(iszero(b))
@@ -555,41 +564,102 @@ bigint* div_big(bigint* a,bigint* b)
 	{
 		quo->len_decimal = decimal_len;
 	}
-
+	del_big(new_a);
+	del_big(new_b);
 	// print_list(quo->list,MAX_LEN);
 	reduce(quo);
 	// print_list(quo->list,MAX_LEN);
 	return quo;
 }
 
-//    int main()
-//    {
+bigint* power(bigint* a, bigint* b)
+{
+	reduce(a);
+	reduce(b);
+	//check pow ( 1234.00,1.000)
+	if(b->len_decimal != 0)
+	{
+		FracPowErr = 1;
+		error();
+	}
+	bigint* new_a = clone_big(a);
+	bigint* new_b = clone_big(b);
+	bigint* ans = conv_str_to_bigint(0,"1.0");
+	bigint* two = conv_str_to_bigint(0,"2.0");
+	if(iszero(b))
+	{
+		return ans;
+	}
+	if(b->is_neg == 1)
+	{
+		// NegPowErr = 1;
+		// error();
+		new_a = div_big(ans,new_a);
+		new_b->is_neg = 0;
+		
+	}
+
+	// print_bigint(new_a);
+	// printf("Ki power ");
+	// print_bigint(new_b);
+
+	while(!iszero(new_b))
+	{
+		// printf("Power - ");print_bigint(new_b);
+		// printf("Ans - ");print_bigint(ans);
+		if(new_b->list[0]%2 == 0)
+		{
+			new_a = mult(new_a,new_a);
+			new_b = div_big(new_b,two);
+		}
+		else
+		{
+			ans = mult(ans,new_a);
+			new_a = mult(new_a,new_a);
+			new_b->list[0]--;
+			new_b = div_big(new_b,two);
+		}
+	}
+	del_big(new_a);
+	del_big(new_b);
+	del_big(two);
+	reduce(ans);
+	return ans;
+
+}
+
+// int main()
+// {
 // 	char s[100];
-//  	scanf("%s",s);
-//  	bigint* big1 = conv_str_to_bigint(0,s);
-//     print_bigint(big1);
+// 	scanf("%s",s);
+// 	bigint* big1 = conv_str_to_bigint(0,s);
+// 	// big1->is_neg=1;
+// 	// print_bigint(big1);
 	
-// // 	// scanf("%s",s);
-// // 	// bigint* big2 = conv_str_to_bigint(0,s);
-// // 	// big2->is_neg = 1;
-// // 	// print_bigint(big2);
-// // 	// bigint* subbed = sub(big1,big2,1);
-// // 	// print_bigint(subbed);
-// // 	// print_bigint(big1);
-// // 	// print_bigint(big2);
-// // 	// bigint* mul = mult(big1,big2);
-// // 	// print_bigint(mul);
-// // 	// print_bigint(big1);
-// // 	// print_bigint(big2);
-// // 	// printf("less than equal %d\n",lessthanequal(big1,big2));
-// // 	// print_bigint(big1);
-// // 	// print_bigint(big2);
-// // 	// bigint* div1 = div_big(big1,big2);
-// // 	// print_bigint(div1);
-// // 	// bigint* sq = big_sqrt(big1);
-// // 	// print_bigint(sq);
-//  	printf("Logging\n");
-//  	bigint* lg = big_log(big1);
-//  	print_bigint(lg);
-//  	return 0;
-//  }
+// 	scanf("%s",s);
+// 	bigint* big2 = conv_str_to_bigint(0,s);
+// 	big2->is_neg = 1;
+// 	// print_bigint(big2);
+// 	// bigint* subbed = sub(big1,big2,1);
+// 	// print_bigint(subbed);
+// 	// print_bigint(big1);
+// 	// print_bigint(big2);
+// 	// bigint* mul = mult(big1,big2);
+// 	// print_bigint(mul);
+// 	// print_bigint(big1);
+// 	// print_bigint(big2);
+// 	// printf("less than equal %d\n",lessthanequal(big1,big2));
+// 	// print_bigint(big1);
+// 	// print_bigint(big2);
+// 	// bigint* div1 = div_big(big1,big2);
+// 	// print_bigint(div1);
+// 	// bigint* sq = big_sqrt(big1);
+// 	// print_bigint(sq);
+// 	// printf("Logging\n");
+// 	// bigint* lg = big_log(big1);
+// 	// print_bigint(lg);
+// 	printf("Powing\n");
+// 	bigint* po = power(big1,big2);
+// 	print_bigint(po);
+// 	return 0;
+// }
