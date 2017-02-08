@@ -25,6 +25,7 @@
 	bigint* big_log(bigint* a);
 	bigint* ab(bigint* a);
 	int iszero (bigint* a);
-
+	bigint* power(bigint* a, bigint* b);
+	void del_big(bigint* big);
 	extern int MAX_LEN;
 #endif
