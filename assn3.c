@@ -134,7 +134,6 @@ int reduce(int MAX_LEN,bigint* big)
 	}
 	else
 	{
-		//TODO: Round Off Procedure
 		int i= len_total - MAX_LEN;
 		int j=0;
 		for(;i<len_total;i++)
@@ -142,6 +141,7 @@ int reduce(int MAX_LEN,bigint* big)
 			new_list[j] = big->list[i];
 			j++;
 		}
+
 		big->len_decimal = MAX_LEN - final_integer_len;
 	}
 	free(big->list);
@@ -473,15 +473,13 @@ bigint* big_log(bigint* a)
  	    sprintf(x,"%d",no_dig);
  	    bigint* mantissa = conv_str_to_bigint(0,x);
  	    // print_bigint(mantissa);
- 	    char *log_10 = "2.30258509299\0";
+ 	    char log_10[] = "2.30258509299\0";
  	    if(MAX_LEN < 12)
  	    {
  	    	log_10[MAX_LEN] = '\0';
  	    }
  	    bigint* log10 = conv_str_to_bigint(0,log_10);	
- 	    print_bigint(log10);
  	    mantissa = mult(mantissa,log10,0);
- 	    print_bigint(mantissa);
  	    ans = add(ans,mantissa,1);
  	}
  	return ans;  
