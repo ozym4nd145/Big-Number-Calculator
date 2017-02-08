@@ -16,7 +16,7 @@
 %type<big_i> term
 %type<big_i> factor exp;
 %token<stri> NUMBER
-%token ADD SUB MUL DIV SQRT LOG POW
+%token ADD SUB MUL DIV SQRT LOG POW COMMA
 %token OP CP
 %token EOL
 
@@ -55,7 +55,7 @@ term: NUMBER {
 	| OP exp CP {$$ = $2;}
 	| SQRT term {$$ = big_sqrt($2);}
 	| LOG term {$$ = big_log($2);}
-	| POW term {$$ = $2;}
+	| POW OP term COMMA term CP {$$ = power($3,$5);}
 	;
 
 %%

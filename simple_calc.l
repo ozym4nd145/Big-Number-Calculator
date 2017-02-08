@@ -27,7 +27,9 @@
 "/" {
 		return DIV;
 	}
-
+"," {
+		return COMMA;
+	}
 [0-9]+(\.[0-9]+)? {
 	char* numb = strdup(yytext);	
 	yylval.stri = numb;
