@@ -59,7 +59,7 @@ int calc_len(bigint* big)
 	int i=len-1;
 	// print_list(big->list,len);
 	// printf("Ha - %d\nI - %d\nLim - %d\n",big->list[i],i,big->len_decimal);
-	while(big->list[i] == 0 && i>=big->len_decimal)
+	while(i>=big->len_decimal && big->list[i] == 0)
 	{
 		len--;
 		i--;
@@ -580,8 +580,10 @@ bigint* big_log(bigint* a)
  		del_big(ans);
  	    ans = sub(a,one,1);
  		bigint* cntr = clone_big(one);
- 		while(lessthanequal(ab(curterm),err)==0)
+ 		temp = ab(curterm);
+ 		while(lessthanequal(temp,err)==0)
  		{
+ 			del_big(temp);
  			temp = mult(curterm,cntr,0);
  			del_big(curterm);
  			curterm = temp;
@@ -601,10 +603,12 @@ bigint* big_log(bigint* a)
  			temp = add(ans,curterm,1);
  			del_big(ans);
  			ans = temp;
+ 			temp = ab(curterm);
  		}
  		del_big(cntr);
  	    del_big(term);
  	    del_big(curterm);
+ 	    del_big(temp);
 
  	    temp = div_big(ans,log10);
  	    del_big(log10);
@@ -644,7 +648,10 @@ bigint* big_log(bigint* a)
  	    // print_bigint(mantissa);
  	    	
  	    // mantissa = mult(mantissa,log10,0);
- 	    ans = add(ans,mantissa,1);
+ 	    temp = add(ans,mantissa,1);
+ 	    del_big(mantissa);
+ 	    del_big(ans);
+ 	    ans = temp;
  	}
  	return ans;  
 }
