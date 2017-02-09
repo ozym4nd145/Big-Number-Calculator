@@ -13,8 +13,8 @@
 	bigint* big_i;
 }
 
-%type<big_i> term
-%type<big_i> factor exp;
+%type<big_i> unit
+%type<big_i> mult_div expression;
 %token<stri> NUMBER
 %token ADD SUB MUL DIV SQRT LOG POW COMMA
 %token OP CP
@@ -22,24 +22,24 @@
 
 %%
 
-calclist:
-	|	calclist exp EOL {
+calcexpression:
+	|	calcexpression expression EOL {
 							printf("Result => ");
 							print_bigint($2);
 						}
 	;
 
-exp: factor
-	|	exp ADD factor { $$ = add($1,$3,1);}
-	|	exp SUB factor { $$ = sub($1,$3,1); }
+expression: mult_div
+	|	expression ADD mult_div { $$ = add($1,$3,1);}
+	|	expression SUB mult_div { $$ = sub($1,$3,1); }
 	;
 
-factor: term
-	|	factor MUL term {$$ = mult($1,$3,1); }
-	|	factor DIV term {$$ = div_big($1,$3); }
+mult_div: unit
+	|	mult_div MUL unit {$$ = mult($1,$3,1); }
+	|	mult_div DIV unit {$$ = div_big($1,$3); }
 	;
 
-term: NUMBER {
+unit: NUMBER {
 			bigint* big = conv_str_to_bigint(0,$1);
 			//print_bigint(big);
 			$$ = big;
@@ -51,10 +51,10 @@ term: NUMBER {
 			//print_bigint(big);
 			$$ = big;
 		}
-	| OP exp CP {$$ = $2;}
-	| SQRT term {$$ = big_sqrt($2);}
-	| LOG term {$$ = big_log($2);}
-	| POW OP term COMMA term CP {$$ = power($3,$5);}
+	| OP expression CP {$$ = $2;}
+	| SQRT unit {$$ = big_sqrt($2);}
+	| LOG unit {$$ = big_log($2);}
+	| POW OP unit COMMA unit CP {$$ = power($3,$5);}
 	;
 
 %%

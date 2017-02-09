@@ -53,7 +53,7 @@
 	}
 .	{
 		SynErr = 1;
-		error();
+		throw_err();
 	}
 
 %%;

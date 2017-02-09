@@ -11,6 +11,7 @@
 	bigint* conv_str_to_bigint(int is_neg,char* string);
 	int reduce(int m,bigint* big);
 	void print_bigint(bigint* big);
+	void print_list(int* l,int len);
 	bigint* add(bigint* a, bigint* b,int ifred);
 	bigint* sub(bigint* a,bigint* b,int ifred);
 	bigint* retzero();
