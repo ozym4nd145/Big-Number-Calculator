@@ -120,7 +120,7 @@ int reduce(int MAX_LEN,bigint* big)
 	if(integer_length > MAX_LEN)
 	{
 		LowPrec = 1;
-		error();
+		throw_err();
 	}
 	int* new_list = (int*) calloc(MAX_LEN,sizeof(int));
 
@@ -906,11 +906,11 @@ bigint* power(bigint* a, bigint* b)
 // int main()
 // {
 // 	char s[100];
-// 	freopen("input.txt","r",stdin);
+// 	freopen("input1.txt","r",stdin);
 // 	MAX_LEN=20;
 // 	scanf("%s",s);
 // 	bigint* big1 = conv_str_to_bigint(0,s);
-// 	big1->is_neg=1;
+// 	//big1->is_neg=1;
 // 	// print_bigint(big1);
 	
 // 	scanf("%s",s);
@@ -928,16 +928,16 @@ bigint* power(bigint* a, bigint* b)
 // 	// printf("less than equal %d\n",lessthanequal(big1,big2));
 // 	// print_bigint(big1);
 // 	// print_bigint(big2);
-// 	bigint* div1 = div_big(big1,big2);
-// 	debug_print(div1,"ANS");
-// 	print_bigint(div1);
+// 	//bigint* div1 = div_big(big1,big2);
+// 	//debug_print(div1,"ANS");
+// 	//print_bigint(div1);
 // 	// bigint* sq = big_sqrt(big1);
 // 	// print_bigint(sq);
 // 	// printf("Logging\n");
 // 	// bigint* lg = big_log(big1);
 // 	// print_bigint(lg);
-// 	// printf("Powing\n");
-// 	// bigint* po = power(big1,big2);
-// 	// print_bigint(po);
+// 	printf("Powing\n");
+// 	bigint* po = power(big1,big2);
+// 	print_bigint(po);
 // 	return 0;
 // }
