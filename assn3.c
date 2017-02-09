@@ -270,6 +270,7 @@ void print_bigint(bigint* biga)
 		}
 	}
 	printf("\n");
+	del_big(big);
 }
 
 bigint* sub(bigint* a,bigint* b,int ifred)
@@ -371,13 +372,8 @@ bigint* add(bigint* a, bigint* b,int ifred)
 		}
 		// print_list(new_big->list,len+1);
 		if(ifred)
-		{if(reduce(MAX_LEN,new_big) == -1)
-		{
-			//RAISE ERROR;
-			throw_err();
-		}}
+			reduce(MAX_LEN,new_big);
 	}
-
 
 	free(new_a);
 	free(new_b);
@@ -386,15 +382,8 @@ bigint* add(bigint* a, bigint* b,int ifred)
 
 bigint* digmult(bigint* a,int x)
 {
- 	// printf("----------------------------------------\n");
  	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
- 	// print_bigint(a);
- 	// printf("Mult by - %d\n",x);
  	int len_a = calc_len(a);
- 	// printf("LENA = %d\narr_len - %d\n",len_a,a->arr_len);
- 	// int len_a = -1*max(-1*a->arr_len,-1*alen);
- 	// int len_a = a->arr_len;
- 	// new_big->arr_len = a->arr_len + 1;
  	new_big->arr_len = len_a + 1;
  	int carry = 0,i;
  	new_big->list = (int*) calloc(len_a+1,sizeof(int));
@@ -410,22 +399,18 @@ bigint* digmult(bigint* a,int x)
 
 bigint* mult(bigint* a,bigint* b,int ifred)
 {
-	// printf("MAX_LEN - %d\n",MAX_LEN);
-	// printf("Multiplying \n");
-	// print_bigint(a);
- 	// printf("A: LENA = %d\narr_len - %d\n",calc_len(a),a->arr_len);
-	// print_bigint(b);
- 	// printf("B: LENA = %d\narr_len - %d\n",calc_len(b),b->arr_len);
-
  	bigint* ans = retzero();
  	int len_a = a->arr_len;
  	int true_len = calc_len(a);
  	int i = true_len-1;
  	for(i = true_len-1;i>=0;i--)
  	{
- 		int x = a->list[i];
- 		ans = add(digmult(b,x),digmult(ans,10),0);
- 		// print_bigint(ans);
+ 		bigint* dig_1 = digmult(b,a->list[i]);
+ 		bigint* dig_2 = digmult(ans,10);
+ 		del_big(ans);
+ 		ans = add(dig_1,dig_2,0);
+ 		del_big(dig_1);
+ 		del_big(dig_2);
  	}
  	ans->len_decimal = b->len_decimal + a->len_decimal;
  	ans->is_neg = (a->is_neg + b->is_neg) % 2;
@@ -435,40 +420,68 @@ bigint* mult(bigint* a,bigint* b,int ifred)
 } 
 
 int iszero (bigint* a)
- {
- 	int l = a->arr_len;
- 	int i = 0;
- 	for(i=0;i<l;i++)
- 	{
- 		if(a->list[i]!=0)
- 			 return 0;
- 	}
- 	return 1;
- }
+{
+	int l = a->arr_len;
+	int i = 0;
+	for(i=0;i<l;i++)
+	{
+		if(a->list[i]!=0)
+			 return 0;
+	}
+	return 1;
+}
 int lessthan (bigint* a,bigint* b)
- {
- 	bigint* diff = sub(a,b,0);
- 	if(iszero(diff))
- 		 return 0;
- 	if(diff->is_neg == 1)
- 	     return 1;
- 	return 0;     	
- }
+{
+	bigint* diff = sub(a,b,0);
+	if(iszero(diff))
+	{
+		del_big(diff);
+		return 0;
+	}
+	if(diff->is_neg == 1)
+	{
+		del_big(diff);
+	    return 1;
+	}
+	del_big(diff);
+	return 0;     	
+}
 int lessthanequal (bigint* a,bigint* b)
 {
  	bigint* diff = sub(a,b,0);
  	if(iszero(diff))
- 		 return 1;
+ 	{
+ 		del_big(diff);
+ 		return 1;
+ 	}
  	if(diff->is_neg == 1)
- 	     return 1;
+ 	{
+ 		del_big(diff);
+ 	    return 1;
+ 	}
+ 	del_big(diff);
  	return 0;     	
 }
+
+int isEqual(bigint* a, bigint* b)
+{
+	bigint* sub_term = sub(a,b,1);
+	if(iszero(sub_term))
+	{
+		del_big(sub_term);
+		return 1;
+	}
+	del_big(sub_term);
+	return 0;
+}
+
 bigint* ab(bigint* a)
- {
- 	bigint* a1 = clone_big(a);
- 	a1->is_neg = 0;
- 	return a1;
- }
+{
+	bigint* a1 = clone_big(a);
+	a1->is_neg = 0;
+	return a1;
+}
+
 bigint* big_sqrt(bigint* a)
 {
 	if(iszero(a))
@@ -485,42 +498,71 @@ bigint* big_sqrt(bigint* a)
 	bigint* err = conv_str_to_bigint(0,"1");
     err->len_decimal = (MAX_LEN/2);
 	bigint* two = conv_str_to_bigint(0,"2.0");
-	while((lessthanequal(ab(div_big(sub(a,mult(ans,ans,0),1),a)),err))==0)
+
+	bigint* mul_term = mult(ans,ans,0);
+	bigint* sub_term = sub(a,mul_term,1);
+	bigint* div_term = div_big(sub_term,a);
+	bigint* abs_term = ab(div_term);
+
+	while(lessthanequal(abs_term,err)==0)
 	{
-		// printf("-----------------LOOP----------------------\n");
-		// printf("Error => ");print_bigint(err);
-		// bigint* debug = ab(div_big(sub(a,mult(ans,ans,0),1),a));
-		// printf("DEBUG => ");print_bigint(debug);
-		// printf("LOOP LESS ANS => %d\n",lessthanequal(ab(div_big(sub(a,mult(ans,ans,0),1),a)),err));
-		bigint* fx = sub(mult(ans,ans,0),a,1);
-		// printf("fx - ");print_bigint(fx);
-		// printf("two - ");print_bigint(two);
+		del_big(mul_term);
+		del_big(sub_term);
+		del_big(div_term);
+		del_big(abs_term);
+
+		mul_term = mult(ans,ans,0);
+		bigint* fx = sub(mul_term,a,1);
+
+		del_big(mul_term);
+
 		bigint* fdashx = mult(ans,two,0);
-		// printf("fdashx - ");print_bigint(fdashx);
 		bigint* temp = div_big(fx,fdashx);
-		// printf("Divide - ");print_bigint(temp);
+
+		del_big(fx);
+		del_big(fdashx);
+
 		bigint* new = sub(ans,temp,1);
-		// printf("New - ");print_bigint(new);
+
+		del_big(ans);
+		del_big(temp);
+
 		ans = new;
+		mul_term = mult(ans,ans,0);
+		sub_term = sub(a,mul_term,1);
+		div_term = div_big(sub_term,a);
+		abs_term = ab(div_term);
 		// printf("-------------------------------------------------\n");
-	} 
+	}
+	del_big(mul_term);
+	del_big(sub_term);
+	del_big(div_term);
+	del_big(abs_term);
+	del_big(err);
+	del_big(two);
 	reduce(MAX_LEN,ans);
 	return ans;     
-} 
+}
+
 bigint* big_log(bigint* a)
 {
 	bigint* one = conv_str_to_bigint(0,"1");
-	if(lessthanequal(a,retzero())==1)
- 	     { 
- 	     	LogErr = 1;
- 	     	throw_err();
- 	     }
- 	else if(iszero(sub(a,one,1))==1)
- 	       return retzero();     
- 	bigint* ans = retzero();  
  	bigint* zer = retzero();
+	if(lessthanequal(a,zer)==1)
+    { 
+  		del_big(one);
+ 		del_big(zer);
+	   	LogErr = 1;
+    	throw_err();
+    }
+ 	else if(isEqual(a,one)==1)
+ 	{
+ 		del_big(one);
+		return zer;     
+	}
+ 	bigint* ans = retzero();  
  	bigint* err = conv_str_to_bigint(0,"1");
- 	err->len_decimal =-1*max(1-MAX_LEN,-5);
+ 	err->len_decimal = -1*max(1-(MAX_LEN/2),-5);
 
  	char log_10[] = "2.3025137650431014377934029533004176534526905103187315981639\0";
     if(MAX_LEN < strlen(log_10))
@@ -529,35 +571,73 @@ bigint* big_log(bigint* a)
     }
     bigint* log10 = conv_str_to_bigint(0,log_10);
 
+    bigint* temp;
+
  	if(lessthan(a,one)==1)
  	{
  		bigint* term = sub(one,a,1);
  		bigint* curterm = sub(a,one,1);
+ 		del_big(ans);
  	    ans = sub(a,one,1);
- 		bigint* cntr = sub(one,zer,1);
+ 		bigint* cntr = clone_big(one);
  		while(lessthanequal(ab(curterm),err)==0)
  		{
- 			curterm = mult(curterm,cntr,0);
- 			cntr = add(cntr,one,1);
- 			curterm = div_big(curterm,cntr);
- 			curterm = mult(curterm,term,0);
- 			ans = add(ans,curterm,1);
+ 			temp = mult(curterm,cntr,0);
+ 			del_big(curterm);
+ 			curterm = temp;
+
+ 			temp = add(cntr,one,1);
+ 			del_big(cntr);
+ 			cntr = temp;
+
+ 			temp = div_big(curterm,cntr);
+ 			del_big(curterm);
+ 			curterm = temp;
+
+ 			temp = mult(curterm,term,0);
+ 			del_big(curterm);
+ 			curterm = temp;
+
+ 			temp = add(ans,curterm,1);
+ 			del_big(ans);
+ 			ans = temp;
  		}
- 	    ans = div_big(ans,log10);
+ 		del_big(cntr);
+ 	    del_big(term);
+ 	    del_big(curterm);
+
+ 	    temp = div_big(ans,log10);
+ 	    del_big(log10);
+ 	    del_big(err);
+ 	    del_big(one);
+ 	    del_big(zer);
+ 	    del_big(ans);
+ 	    ans = temp;
  	}
  	else
  	{
+ 		del_big(log10);
+ 	    del_big(err);
+ 	    del_big(one);
+ 	    del_big(zer);
+ 	    del_big(ans);
  		int no_dig = calc_len(a) - a->len_decimal ;
- 		bigint* ten_pow = (bigint*) calloc(1,sizeof(bigint));
- 	    ten_pow->arr_len = MAX_LEN;
- 	    ten_pow->list = (int*) calloc(MAX_LEN,sizeof(int));
- 	    ten_pow->len_decimal = 0;
- 	    int i;
- 	    for(i =0;i<no_dig;i++)
- 	    	 ten_pow->list[i] = 0;
- 	    ten_pow->list[i] = 1;
- 	    bigint* newnum = div_big(a,ten_pow);
- 	    ans = big_log(newnum);
+ 		int orig_dec_len = a->len_decimal;
+ 		a->len_decimal = no_dig + orig_dec_len;
+ 		// bigint* ten_pow = (bigint*) calloc(1,sizeof(bigint));
+ 	 //    ten_pow->arr_len = MAX_LEN;
+ 	 //    ten_pow->list = (int*) calloc(MAX_LEN,sizeof(int));
+ 	 //    ten_pow->len_decimal = 0;
+ 	 //    int i;
+ 	 //    for(i =0;i<no_dig;i++)
+ 	 //    	 ten_pow->list[i] = 0;
+ 	 //    ten_pow->list[i] = 1;
+ 	 //    bigint* newnum = div_big(a,ten_pow);
+ 	 //    ans = big_log(newnum);
+ 	    ans = big_log(a);
+
+ 	    a->len_decimal = orig_dec_len;
+ 	    
  	    char x[MAX_LEN+2];
  	    sprintf(x,"%d",no_dig);
  	    bigint* mantissa = conv_str_to_bigint(0,x);
@@ -625,17 +705,48 @@ bigint* div_big(bigint* a,bigint* b)
 	/**
 	 * Made a and b of same length
 	 */
-	for(i=0;i<(len_new_b-len_new_a);i++)
+	if((len_new_b - len_new_a) > 0)
 	{
-		new_a = digmult(new_a,10);
+		int i=len_new_a-1,j=(len_new_b - len_new_a);
+		while(i>=0)
+		{
+			new_a->list[i+j] = new_a->list[i];
+			i--;
+		}
+		j--;
+		while(j>=0)
+		{
+			new_a->list[j] = 0;
+			j--;
+		}
 	}
-	for(i=0;i<(len_new_a-len_new_b);i++)
+	else if ((len_new_b - len_new_a) < 0)
 	{
-		new_b = digmult(new_b,10);
+		int i=len_new_b-1,j=(len_new_a - len_new_b);
+		while(i>=0)
+		{
+			new_b->list[i+j] = new_b->list[i];
+			i--;
+		}
+		j--;
+		while(j>=0)
+		{
+			new_b->list[j] = 0;
+			j--;
+		}
 	}
+	// for(i=0;i<(len_new_b-len_new_a);i++)
+	// {
+	// 	new_a = digmult(new_a,10);
+	// }
+	// for(i=0;i<(len_new_a-len_new_b);i++)
+	// {
+	// 	new_b = digmult(new_b,10);
+	// }
 	i=MAX_LEN-1; //denotes current position
 
 	int decimal_on = 0;
+	bigint* temp;
 
 	for(;i>=0;i--)
 	{
@@ -652,12 +763,16 @@ bigint* div_big(bigint* a,bigint* b)
 		}
 		if(decimal_on)
 		{
-			new_a = digmult(new_a,10);
+			temp = digmult(new_a,10);
+			del_big(new_a);
+			new_a = temp;
 		}
 		int curr = 0;
 		while(lessthanequal(new_b,new_a))
 		{
-			new_a = sub(new_a,new_b,0);
+			temp = sub(new_a,new_b,0);
+			del_big(new_a);
+			new_a = temp;
 			curr++;
 		}
 		quo->list[i] = curr;
@@ -704,27 +819,35 @@ bigint* div_big(bigint* a,bigint* b)
 
 bigint* power(bigint* a, bigint* b)
 {
-	reduce(MAX_LEN,a);
-	reduce(MAX_LEN,b);
-	//check pow ( 1234.00,1.000)
-	if(b->len_decimal != 0)
-	{
-		FracPowErr = 1;
-		throw_err();
-	}
 	bigint* new_a = clone_big(a);
 	bigint* new_b = clone_big(b);
+	bigint* temp;
+	reduce(MAX_LEN,new_a);
+	reduce(MAX_LEN,new_b);
+	//check pow ( 1234.00,1.000)
+	if(new_b->len_decimal != 0)
+	{
+		FracPowErr = 1;
+		del_big(new_a);
+		del_big(new_b);
+		throw_err();
+	}
 	bigint* ans = conv_str_to_bigint(0,"1.0");
 	bigint* two = conv_str_to_bigint(0,"2.0");
 	if(iszero(b))
 	{
+		del_big(new_a);
+		del_big(new_b);
+		del_big(two);
 		return ans;
 	}
 	if(b->is_neg == 1)
 	{
 		// NegPowErr = 1;
 		// throw_err();
-		new_a = div_big(ans,new_a);
+		temp = div_big(ans,new_a);
+		del_big(temp);
+		new_a = temp;
 		new_b->is_neg = 0;
 		
 	}
@@ -739,15 +862,30 @@ bigint* power(bigint* a, bigint* b)
 		// printf("Ans - ");print_bigint(ans);
 		if(new_b->list[0]%2 == 0)
 		{
-			new_a = mult(new_a,new_a,0);
-			new_b = div_big(new_b,two);
+			temp = mult(new_a,new_a,0);
+			del_big(new_a);
+			new_a = temp;
+
+			temp = div_big(new_b,two);
+			del_big(new_b);
+			new_b = temp;
 		}
 		else
 		{
-			ans = mult(ans,new_a,0);
-			new_a = mult(new_a,new_a,0);
+			temp = mult(ans,new_a,0);
+			del_big(ans);
+			ans = temp;
+
+			temp = mult(new_a,new_a,0);
+			del_big(new_a);
+			new_a = temp;
+
 			new_b->list[0]--;
-			new_b = div_big(new_b,two);
+
+			temp = div_big(new_b,two);
+			del_big(new_b);
+			new_b = temp;
+			
 		}
 	}
 	del_big(new_a);
