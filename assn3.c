@@ -56,7 +56,7 @@ int calc_len(bigint* big)
 {
 	int len = big->arr_len;
 	int i=len-1;
-	while(big->list[i] == 0)
+	while(big->list[i] == 0 && i>=0)
 	{
 		len--;
 		i--;
@@ -76,6 +76,8 @@ bigint* retzero()
 
 bigint* conv_str_to_bigint(int is_neg,char* string)
 {
+	// printf("MAX_LEN - %d\n",MAX_LEN);
+	// printf("Converting - %s\n",string);
 	int len_str = strlen(string);
 	bigint* big = (bigint*) calloc(1,sizeof(bigint));
 	// big->len_total = len_str;
@@ -97,7 +99,7 @@ bigint* conv_str_to_bigint(int is_neg,char* string)
 			// big->len_total--;
 		}
 	}
-	reduce(MAX_LEN/2,big);
+	reduce(MAX_LEN,big);
 	return big;
 }
 
@@ -321,8 +323,12 @@ bigint* add(bigint* a, bigint* b,int ifred)
 
 bigint* digmult(bigint* a,int x)
 {
+ 	// printf("----------------------------------------\n");
  	bigint* new_big = (bigint*) calloc(1,sizeof(bigint));
+ 	// print_bigint(a);
+ 	// printf("Mult by - %d\n",x);
  	int len_a = calc_len(a);
+ 	// printf("LENA = %d\narr_len - %d\n",len_a,a->arr_len);
  	// int len_a = -1*max(-1*a->arr_len,-1*alen);
  	// int len_a = a->arr_len;
  	// new_big->arr_len = a->arr_len + 1;
@@ -341,6 +347,13 @@ bigint* digmult(bigint* a,int x)
 
 bigint* mult(bigint* a,bigint* b,int ifred)
 {
+	// printf("MAX_LEN - %d\n",MAX_LEN);
+	// printf("Multiplying \n");
+	// print_bigint(a);
+ 	// printf("A: LENA = %d\narr_len - %d\n",calc_len(a),a->arr_len);
+	// print_bigint(b);
+ 	// printf("B: LENA = %d\narr_len - %d\n",calc_len(b),b->arr_len);
+
  	bigint* ans = retzero();
  	int len_a = a->arr_len;
  	int true_len = calc_len(a);

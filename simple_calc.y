@@ -40,7 +40,6 @@ factor: term
 	;
 
 term: NUMBER {
-			//printf(" num = %s\n",$1);
 			bigint* big = conv_str_to_bigint(0,$1);
 			//print_bigint(big);
 			$$ = big;
