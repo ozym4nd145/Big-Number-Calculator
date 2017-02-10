@@ -906,15 +906,15 @@ bigint* power(bigint* a, bigint* b)
 // int main()
 // {
 // 	char s[100];
-// 	freopen("input1.txt","r",stdin);
-// 	MAX_LEN=20;
+// 	// freopen("input1.txt","r",stdin);
+// 	MAX_LEN=6000;
 // 	scanf("%s",s);
-// 	bigint* big1 = conv_str_to_bigint(0,s);
+// 	bigint* big1 = conv_str_to_bigint(0,s);	
 // 	//big1->is_neg=1;
 // 	// print_bigint(big1);
 	
-// 	scanf("%s",s);
-// 	bigint* big2 = conv_str_to_bigint(0,s);
+// 	// scanf("%s",s);
+// 	// bigint* big2 = conv_str_to_bigint(0,s);
 // 	// big2->is_neg = 1;
 // 	// print_bigint(big2);
 // 	// bigint* subbed = sub(big1,big2,1);
@@ -936,8 +936,29 @@ bigint* power(bigint* a, bigint* b)
 // 	// printf("Logging\n");
 // 	// bigint* lg = big_log(big1);
 // 	// print_bigint(lg);
-// 	printf("Powing\n");
-// 	bigint* po = power(big1,big2);
-// 	print_bigint(po);
+// 	// printf("Powing\n");
+// 	// bigint* po = power(big1,big2);
+// 	// print_bigint(po);
+	
+// 	printf("Factorialing\n");
+// 	bigint* one = conv_str_to_bigint(0,"1");
+// 	bigint* ans = clone_big(one);
+// 	bigint* temp;
+// 	while(!isEqual(one,big1))
+// 	{
+// 		print_bigint(big1);
+// 		// print_bigint(ans);
+// 		printf("---------------------------\n");
+// 		temp = mult(ans,big1,0);
+// 		del_big(ans);
+// 		ans = temp;
+
+// 		temp = sub(big1,one,0);
+// 		del_big(big1);
+// 		big1 = temp;
+// 	}
+// 	del_big(big1);
+// 	print_bigint(ans);
+// 	del_big(ans);
 // 	return 0;
 // }
