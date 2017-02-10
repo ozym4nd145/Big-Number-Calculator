@@ -25,10 +25,10 @@
 calcexpression:
 	|	calcexpression expression EOL {
 							printf("Result => ");
+                            reduce(MAX_LEN/2,$2);
 							print_bigint($2);
 							del_big($2);
-						}
-	;
+						} ;
 
 expression: mult_div
 	|	expression ADD mult_div {
@@ -85,7 +85,7 @@ unit: NUMBER {
 
 main(int argc, char* argv[])
 {
-	freopen("input.txt","r",stdin);
+	//freopen("input.txt","r",stdin);
 	scanf("%d ",&MAX_LEN);
 	MAX_LEN = 2*MAX_LEN;
 	yyparse();
