@@ -23,13 +23,17 @@
 	int iszero (bigint* a);
 	bigint* clone_big(bigint* a);
 	bigint* big_sqrt(bigint* a);
-	bigint* big_log(bigint* a);
+	bigint* big_log(bigint* a1);
 	bigint* ab(bigint* a);
 	int iszero (bigint* a);
 	bigint* power(bigint* a, bigint* b);
 	void del_big(bigint* big);
 	int calc_len(bigint* big);
-
+	bigint* powerfrac(bigint* a,bigint* b);
+	bigint* integralpart(bigint* a);
+	bigint* fractionalpart(bigint* a);
+	bigint* powerint(bigint* a, bigint* b);
+	bigint* ex(bigint* a);
 	extern int MAX_LEN;
 	extern int SynErr;
 	extern int DivErr;

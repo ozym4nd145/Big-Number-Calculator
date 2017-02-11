@@ -544,8 +544,9 @@ bigint* big_sqrt(bigint* a)
 	return ans;     
 }
 
-bigint* big_log(bigint* a)
+bigint* big_log(bigint* a1)
 {
+	bigint* a = clone_big(a1);
 	bigint* one = conv_str_to_bigint(0,"1");
  	bigint* zer = retzero();
 	if(lessthanequal(a,zer)==1)
@@ -575,6 +576,14 @@ bigint* big_log(bigint* a)
 
  	if(lessthan(a,one)==1)
  	{
+ 		int startzero = 0;
+ 		for(int ii = (a->len_decimal-1);ii>=0;ii--)
+ 		{
+ 			if(a->list[ii]!=0)
+ 				break;
+ 			startzero++;
+ 		}
+ 		a->len_decimal = a->len_decimal - startzero;
  		bigint* term = sub(one,a,1);
  		bigint* curterm = sub(a,one,1);
  		del_big(ans);
@@ -609,13 +618,17 @@ bigint* big_log(bigint* a)
  	    del_big(term);
  	    del_big(curterm);
  	    del_big(temp);
-
  	    temp = div_big(ans,log10);
  	    del_big(log10);
  	    del_big(err);
  	    del_big(one);
  	    del_big(zer);
  	    del_big(ans);
+ 	    char x[MAX_LEN+2];
+ 	    sprintf(x,"%d",startzero);
+ 	    bigint* mantissa = conv_str_to_bigint(1,x);
+ 	    if(iszero(mantissa)==0)
+ 	       temp = add(temp,mantissa,1);
  	    ans = temp;
  	}
  	else
@@ -653,6 +666,7 @@ bigint* big_log(bigint* a)
  	    del_big(ans);
  	    ans = temp;
  	}
+ 	del_big(a);
  	return ans;  
 }
 
@@ -824,7 +838,7 @@ bigint* div_big(bigint* a,bigint* b)
 	return quo;
 }
 
-bigint* power(bigint* a, bigint* b)
+bigint* powerint(bigint* a, bigint* b)
 {
 	bigint* new_a = clone_big(a);
 	bigint* new_b = clone_big(b);
@@ -853,7 +867,7 @@ bigint* power(bigint* a, bigint* b)
 		// NegPowErr = 1;
 		// throw_err();
 		temp = div_big(ans,new_a);
-		del_big(temp);
+		//del_big(temp);
 		new_a = temp;
 		new_b->is_neg = 0;
 		
@@ -902,21 +916,134 @@ bigint* power(bigint* a, bigint* b)
 	return ans;
 
 }
+bigint* integralpart(bigint* a)
+ {
+ 	bigint* ans = clone_big(a);
+ 	int l1 = calc_len(a) - a->len_decimal;
+ 	reduce(l1,ans);
+ 	return ans;
+ }
+ bigint* fractionalpart(bigint* a)
+ {
+ 	bigint* ans = integralpart(a);
+ 	ans = sub(a,ans,1);
+ 	return ans;
+ }
+ bigint* power(bigint* a, bigint* b)
+{
+	bigint* new_a = clone_big(a);
+	bigint* new_b = clone_big(b);
+	bigint* temp;
+	reduce(MAX_LEN,new_a);
+	reduce(MAX_LEN,new_b);
+	//check pow ( 1234.00,1.000)
+	
+	bigint* ans = conv_str_to_bigint(0,"1.0");
+	bigint* two = conv_str_to_bigint(0,"2.0");
+	if(iszero(b))
+	{
+		del_big(new_a);
+		del_big(new_b);
+		del_big(two);
+		return ans;
+	}
+	if(b->is_neg == 1)
+	{
+		// NegPowErr = 1;
+		// throw_err();
+		temp = div_big(ans,new_a);
+		new_a = temp;
+		//del_big(temp);
+		new_b->is_neg = 0;
+		
+	}
+	bigint* intb = integralpart(new_b);
+	bigint* fracb = fractionalpart(new_b);
+	bigint* intpow = powerint(new_a,intb);
+	bigint* fracpow = powerfrac(new_a,fracb);
+	if(iszero(fracb))
+		ans = clone_big(intpow);
+	else
+	    ans = mult(intpow,fracpow,1);
+	del_big(new_a);
+	del_big(new_b);
+	del_big(two);
+	del_big(intb);
+	del_big(fracb);
+	del_big(intpow);
+	del_big(fracpow);
+	reduce(MAX_LEN,ans);
+	return ans;
 
+}
+bigint* ex(bigint* a)   // e^a
+{
+	bigint* ans = retzero();
+	bigint* term = conv_str_to_bigint(0,"1");
+	bigint* cntr = conv_str_to_bigint(0,"1");
+	bigint* one = conv_str_to_bigint(0,"1");
+	bigint* err = conv_str_to_bigint(0,"1");
+ 	err->len_decimal = -1*max(1-(MAX_LEN/2),-5);
+ 	while(lessthanequal(term,err)==0)
+ 	{
+ 		ans = add(ans,term,0);
+ 		term = mult(term,a,0);
+ 		term = div_big(term,cntr);
+ 		cntr = add(cntr,one,0);
+ 	}
+ 	reduce(MAX_LEN,ans);
+ 	del_big(term);
+ 	del_big(cntr);
+ 	del_big(one);
+ 	del_big(err);
+ 	return ans;
+}
+bigint* powerfrac(bigint* a,bigint* b) // a^b = e^(b*ln(a))
+ {
+ 	//printf("entering power frac \n");
+ 	bigint* lna = big_log(a);
+ 	char log_10[] = "2.3025137650431014377934029533004176534526905103187315981639\0";
+    if(MAX_LEN < strlen(log_10))
+    {
+    	log_10[MAX_LEN] = '\0';
+    }
+    bigint* log10 = conv_str_to_bigint(0,log_10);
+    lna = mult(lna,log10,0);
+ 	//printf(" ln a : \n");
+ 	//print_bigint(lna);
+ 	bigint* blna = mult(b,lna,0);
+ 	//printf(" b* ln a : \n");
+ 	//print_bigint(blna);
+ 	bigint* ans = ex(blna);
+ 	del_big(lna);
+ 	del_big(blna);
+ 	return ans;
+ }
 // int main()
 // {
-// 	char s[100];
+//	char s[100];
 // 	// freopen("input1.txt","r",stdin);
 // 	MAX_LEN=6000;
-// 	scanf("%s",s);
+//  	scanf("%s",s);
 // 	bigint* big1 = conv_str_to_bigint(0,s);	
 // 	//big1->is_neg=1;
-// 	// print_bigint(big1);
-	
-// 	// scanf("%s",s);
-// 	// bigint* big2 = conv_str_to_bigint(0,s);
+// 	print_bigint(big1);
+// 	bigint* expo = ex(big1);
+// 	printf("e raised to power : ");
+// 	print_bigint(expo);
+//	bigint* integ = integralpart(big1);
+//	bigint* frac =  fractionalpart(big1);
+//	printf("integral part ");
+//	print_bigint(integ);
+//	printf("fractional part ");
+//	print_bigint(frac);
+// scanf("%s",s);
+// bigint* big2 = conv_str_to_bigint(0,s);
 // 	// big2->is_neg = 1;
-// 	// print_bigint(big2);
+// print_bigint(big2);
+// printf("a raised to power b :");
+// bigint* apowb = powerfrac(big1,big2);
+// print_bigint(apowb);
 // 	// bigint* subbed = sub(big1,big2,1);
 // 	// print_bigint(subbed);
 // 	// print_bigint(big1);
