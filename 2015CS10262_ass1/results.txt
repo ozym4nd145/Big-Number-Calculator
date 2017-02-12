@@ -1,0 +1,13 @@
+
+Tescase Number	|	bignumcalc time	|	bc time		|	Error Occured	
+1		|	0m0.002s	|	0m0.003s	|	0
+2		|	0m0.001s	|	0m0.002s	|	0
+3		|	0m0.001s	|	0m0.002s	|	0
+4		|	0m0.001s	|	0m0.001s	|	1
+5		|	0m0.001s	|	0m0.001s	|	1
+6		|	0m0.001s	|	0m0.001s	|	1
+7		|	0m0.001s	|	0m0.001s	|	0
+8		|	0m0.001s	|	0m0.001s	|	1
+
+Work jointly done by : 2015CS50459 MAKKUNDA SHARMA
+		     : 2015CS10262 SUYASH AGRAWAL
