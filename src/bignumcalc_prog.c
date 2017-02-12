@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "assn3.h"
+#include "bignumcalc_prog.h"
 
 int SynErr = 0;
 int DivErr = 0;

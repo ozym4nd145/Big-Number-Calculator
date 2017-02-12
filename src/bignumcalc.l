@@ -1,6 +1,6 @@
 %{
-	#include "assn3.h"
-	#include "simple_calc.tab.h"
+	#include "bignumcalc_prog.h"
+	#include "bignumcalc.tab.h"
 	#include <string.h>
 	#include <stdlib.h>
 

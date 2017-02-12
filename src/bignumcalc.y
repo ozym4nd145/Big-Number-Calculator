@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
-	#include "assn3.h"
+	#include "bignumcalc_prog.h"
 	int MAX_LEN;
 %}
 
@@ -24,7 +24,6 @@
 
 calcexpression:
 	|	calcexpression expression EOL {
-							printf("Result => ");
                             reduce(MAX_LEN/2,$2);
 							print_bigint($2);
 							del_big($2);
@@ -85,7 +84,8 @@ unit: NUMBER {
 
 main(int argc, char* argv[])
 {
-	//freopen("input.txt","r",stdin);
+	freopen(argv[1],"r",stdin);
+	freopen(argv[2],"w",stdout);
 	scanf("%d ",&MAX_LEN);
 	MAX_LEN = 2*MAX_LEN;
 	yyparse();
