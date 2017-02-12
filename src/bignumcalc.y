@@ -4,6 +4,7 @@
 	#include <string.h>
 	#include "bignumcalc_prog.h"
 	int MAX_LEN;
+	int SynErr;
 %}
 
 %union {
@@ -93,5 +94,6 @@ main(int argc, char* argv[])
 
 yyerror(char *s)
 {
-	fprintf(stderr, "error - %s\n",s);
+	SynErr = 1;
+	throw_err();
 }
