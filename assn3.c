@@ -577,7 +577,8 @@ bigint* big_log(bigint* a1)
  	if(lessthan(a,one)==1)
  	{
  		int startzero = 0;
- 		for(int ii = (a->len_decimal-1);ii>=0;ii--)
+        int ii;
+ 		for(ii = (a->len_decimal-1);ii>=0;ii--)
  		{
  			if(a->list[ii]!=0)
  				break;
